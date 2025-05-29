@@ -1,11 +1,19 @@
 import React, { useState, useEffect } from "react";
-import './App.css';
+import {
+  TextField,
+  Button,
+  Container,
+  Typography,
+  List,
+  ListItem,
+  ListItemText,
+  Box,
+} from "@mui/material";
 
 function App() {
-
   const [tasks, setTasks] = useState(() => {
-    const storedTasks = sessionStorage.getItem("tasks");
-    return storedTasks ? JSON.parse(storedTasks) : [];
+    const saved = sessionStorage.getItem("tasks");
+    return saved ? JSON.parse(saved) : [];
   });
 
   const [input, setInput] = useState("");
@@ -14,19 +22,12 @@ function App() {
     sessionStorage.setItem("tasks", JSON.stringify(tasks));
   }, [tasks]);
 
- 
   function addTask() {
     if (input.trim() === "") return;
-
-    const newTask = {
-      text: input,
-      completed: false
-    };
-
+    const newTask = { text: input, completed: false };
     setTasks([...tasks, newTask]);
     setInput("");
   }
-
 
   function toggleComplete(index) {
     setTasks(
@@ -36,42 +37,82 @@ function App() {
     );
   }
 
-
   function deleteTask(index) {
-    const updatedTasks = [...tasks];
-    updatedTasks.splice(index, 1);
-    setTasks(updatedTasks);
+    const updated = [...tasks];
+    updated.splice(index, 1);
+    setTasks(updated);
   }
 
   return (
-    <div className="App">
-      <h1>📝 To-Do List</h1>
+    <Box sx={{ backgroundColor: "#f5f7fa", minHeight: "100vh", py: 5 }}>
+      <Container maxWidth="sm" sx={{ backgroundColor: "white", p: 4, borderRadius: 3, boxShadow: 3 }}>
+        <Typography variant="h4" align="center" gutterBottom>
+          📝 To-Do List
+        </Typography>
 
-      <div className="input-section">
-        <input
-          type="text"
+        <TextField
+          fullWidth
+          label="Enter a task"
+          variant="outlined"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => {
-            if (e.key === "Enter") addTask();
+            if (e.key === "Enter") {
+              addTask();
+            }
           }}
-          placeholder="Enter a task"
+          sx={{ mb: 2 }}
         />
-        <button onClick={addTask}>Add</button>
-      </div>
 
-      <ul>
-        {tasks.map((task, index) => (
-          <li key={index} className={task.completed ? "completed" : ""}>
-            {task.text}
-            <button onClick={() => toggleComplete(index)}>
-              {task.completed ? "Undo" : "Done"}
-            </button>
-            <button onClick={() => deleteTask(index)}>❌</button>
-          </li>
-        ))}
-      </ul>
-    </div>
+        <Button
+          variant="contained"
+          fullWidth
+          onClick={addTask}
+          sx={{ mb: 3 }}
+        >
+          Add Task
+        </Button>
+
+        <List>
+          {tasks.map((task, index) => (
+            <ListItem
+              key={index}
+              sx={{
+                bgcolor: "#f9f9f9",
+                mb: 1,
+                borderRadius: 2,
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                textDecoration: task.completed ? "line-through" : "none",
+                color: task.completed ? "gray" : "black",
+              }}
+            >
+              <ListItemText primary={task.text} />
+              <Box>
+                <Button
+                  variant="outlined"
+                  color="success"
+                  size="small"
+                  onClick={() => toggleComplete(index)}
+                  sx={{ mr: 1 }}
+                >
+                  {task.completed ? "Undo" : "Done"}
+                </Button>
+                <Button
+                  variant="outlined"
+                  color="error"
+                  size="small"
+                  onClick={() => deleteTask(index)}
+                >
+                  ❌
+                </Button>
+              </Box>
+            </ListItem>
+          ))}
+        </List>
+      </Container>
+    </Box>
   );
 }
 
