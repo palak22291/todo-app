@@ -1,46 +1,48 @@
-import React ,{useState} from "react";
+import React, { useState, useEffect } from "react";
 import './App.css';
 
 function App() {
 
-  const [tasks,setTasks]=useState([])
-  const[input,setInput]=useState("")
+  const [tasks, setTasks] = useState(() => {
+    const storedTasks = sessionStorage.getItem("tasks");
+    return storedTasks ? JSON.parse(storedTasks) : [];
+  });
 
+  const [input, setInput] = useState("");
 
-  // to add a task
-  function addTask(){
+  useEffect(() => {
+    sessionStorage.setItem("tasks", JSON.stringify(tasks));
+  }, [tasks]);
 
-    if (input.trim()===""){
-      return;                  
-    }   
+ 
+  function addTask() {
+    if (input.trim() === "") return;
 
-    const newTask ={
-      text:input,
-      completed:false
-    }
+    const newTask = {
+      text: input,
+      completed: false
+    };
 
-    const updatedTasks =[...tasks,newTask]
-    setTasks(updatedTasks)
-    setInput("")
-
+    setTasks([...tasks, newTask]);
+    setInput("");
   }
-  // to toggle complete status 
 
-  function toggleComplete(index){
+
+  function toggleComplete(index) {
     setTasks(
-      tasks.map((task,i)=>
-        i===index ? {...task,completed: !task.completed} : task)
-    )
+      tasks.map((task, i) =>
+        i === index ? { ...task, completed: !task.completed } : task
+      )
+    );
   }
 
-  // to delete task 
-  
-  function deleteTask(index){
-    const updatedTasks=[...tasks]
-    updatedTasks.splice(index,1)
-    setTasks(updatedTasks)
 
+  function deleteTask(index) {
+    const updatedTasks = [...tasks];
+    updatedTasks.splice(index, 1);
+    setTasks(updatedTasks);
   }
+
   return (
     <div className="App">
       <h1>📝 To-Do List</h1>
@@ -50,10 +52,8 @@ function App() {
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e)=>{
-            if (e.key==="Enter"){
-              addTask();
-            }
+          onKeyDown={(e) => {
+            if (e.key === "Enter") addTask();
           }}
           placeholder="Enter a task"
         />
@@ -72,8 +72,7 @@ function App() {
         ))}
       </ul>
     </div>
-    
   );
-
 }
+
 export default App;
